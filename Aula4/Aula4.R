@@ -37,7 +37,6 @@ write_rds(juizes_drogas_CL,"E:/ENAP_Especializacao/D6_Analise_de_dados/aulas_ena
 # Faça commit e push do script e do arquivo `.rds` ----
 
 
-
 # Qual juiz julga a maior proporção de processos que tratam de drogas ----
 
 
