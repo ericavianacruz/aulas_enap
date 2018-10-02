@@ -35,10 +35,46 @@ juizes_drogas_CL <-  decisoes %>%
 write_rds(juizes_drogas_CL,"E:/ENAP_Especializacao/D6_Analise_de_dados/aulas_enap/dados/juizes_drogas_CL.rds")
 
 # Faça commit e push do script e do arquivo `.rds` ----
+##########################################################################################Segunda Parte da Aula
+## Usando Tidyverse Gather
+decisoes_gather <- decisoes %>%
+  filter(!is.na(id_decisao)) %>%
+  select(id_decisao:data_registro) %>% 
+  # 1. nome da coluna que vai guardar os nomes de colunas empilhadas
+  # 2. nome da coluna que vai guardar os valores das colunas
+  # 3. seleção das colunas a serem empilhadas
+  gather(key="variavel", value="valor",-id_decisao)%>% 
+  arrange(id_decisao)
 
+decisoes_gather
 
-# Qual juiz julga a maior proporção de processos que tratam de drogas ----
+## Usando Tidyverse Spread
+decisoes_spread <- decisoes %>% 
+  filter(!is.na(id_decisao)) %>% 
+  select(id_decisao:data_registro) %>%
+  gather(key, value,-id_decisao) %>%
+  # 1. coluna a ser espalhada
+  # 2. valores da coluna
+  spread(key, value)
+decisoes_spread
 
+## Qual juiz que julga maior proporcao de processos que tratam de drogras
+
+juizes_drogas_novo <- decisoes %>%
+  select(juiz,txt_decisao,data_registro,municipio) %>%
+  ## limpando os vazios
+  filter (!is.na(txt_decisao)) %>% 
+  ##criando a variavel droga
+  mutate(txt_decisao = tolower(txt_decisao),
+         droga = str_detect(txt_decisao, "droga|entorpecente|psicotr[óo]pico|maconha|haxixe|coca[íi]na"), 
+  ## filtrando
+  droga = case_when(
+    droga == TRUE ~ "droga",
+    droga == FALSE ~ "n_droga"
+  )) %>%
+  group_by (juiz, droga) %>%
+  summarize (qtd_droga = n())
+   
 
 # Crie um objeto contendo informações sobre os tamanhos das bancadas dos ----
 # partidos (arquivo `bancadas.rds`), suas respectivas coligações 
