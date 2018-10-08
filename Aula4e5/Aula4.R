@@ -80,7 +80,6 @@ juizes_drogas_novo <- decisoes %>%
   mutate(total= droga+n_droga, proporcao = droga/total)  
 
 
-
 ##########################################Aula 5 ##########################################################
 ## Qual a quantidade de decições mensal por juiz.
 juiz_mes <-  decisoes %>%
@@ -106,6 +105,8 @@ decisoes_sep <-  decisoes %>%
 setwd("D:/ENAP_Especializacao/D6_Analise_de_dados/aulas_enap/dados/")
 processos <- readRDS("processos_nested.rds")
 
+
+## Trabalhando com arquivos aninhados.
 d_partes <- processos %>%
   select(n_processo, partes) %>%
   unnest(partes)
