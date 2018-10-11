@@ -19,7 +19,7 @@ decisoes <- read_rds("decisoes.rds")
 
 juizes_drogas_CL <-  decisoes %>%
   select(juiz,municipio,txt_decisao,data_registro,data_decisao) %>%
-  ##criando a variavel droga
+  ##criando a variavel droga com o mutate
   mutate(txt_decisao = tolower(txt_decisao), 
          droga = str_detect(txt_decisao, "droga|entorpecente|psicotr[óo]pico|maconha|haxixe|coca[íi]na"),
          # variavel tempo
