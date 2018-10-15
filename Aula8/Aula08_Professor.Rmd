@@ -1,0 +1,199 @@
+---
+title: "Visualização de dados"
+author: "Frederico Bertholini"
+subtitle: Aula 08
+output:
+  ioslides_presentation: 
+    widescreen: yes
+  beamer_presentation: default
+---
+
+
+```{r,eval=T,include=F}
+
+lista.de.pacotes = c("tidyverse","lubridate","janitor","readxl","stringr","repmis","survey","srvyr") # escreva a lista de pacotes
+novos.pacotes <- lista.de.pacotes[!(lista.de.pacotes %in%
+                                      installed.packages()[,"Package"])]
+if(length(novos.pacotes) > 0) {install.packages(novos.pacotes)}
+lapply(lista.de.pacotes, require, character.only=T)
+rm(lista.de.pacotes,novos.pacotes)
+gc()
+
+knitr::opts_knit$set(root.dir = "/Volumes/Macintosh HD/OneDrive/ENAP/aulas_ENAP")
+
+
+```
+
+
+## Preparação para a aula
+
+- Baixe os dados da pasta exercícios (ou faça pull do seu GitHub)
+
+- Configure o GitHub na sua máquina 
+
+ -- Versionamento -> <https://www.curso-r.com/blog/2017-07-17-rstudio-e-github/>
+
+ -- Instruções adicionais de instalação <http://r-bio.github.io/git-installation/>
+
+- Rode todos os pacotes (usando o macetinho) --> pode baixar o script do exercício 6, que já tem tudo. 
+
+- Repositório no GitHub <https://github.com/fredbsr/aulas_ENAP/tree/master/CADS2018>
+
+
+
+## Exercício
+
+- Carregue os dados de exemplo do pacote survey `data(api)`, use o data.frame `apisrs` e expanda a amostra usando apenas variável fpc contendo a contagem finita de população `as_survey(fpc=fpc)`
+
+- Usando a variável `stype` crie uma nova variável indicando se a escola é de nível fundamental (categorias **E** e **M** de `stype`)  ou de nível médio (categoria *H* de `stype`). Dica: use `mutate`e `cas_when`.
+
+- Qual a proporção de escolas por nível (Fundamental, Médio)? (use a variável nova que você criou e a função `survey_mean`), 
+
+ -- Qual o coeficiente de varição dessa proporção?
+
+- Quantas escolas há por nível? (use a variável `stype` e a função `survey_total`)
+
+ -- Qual é o limite inferior e o limite superior da quantidade de escolas por tipo
+
+
+## Resolução
+```{r,eval=F}
+data(api)
+
+srs_design_srvyr <- apisrs %>% 
+  as_survey(fpc = fpc) %>%
+  mutate(nivel=case_when(
+    stype=="E"~"Fundamental",
+    stype=="M"~"Fundamental",
+    stype=="H"~"Médio"
+  ))
+
+```
+
+## 
+```{r,eval=F}
+
+resolucao <- srs_design_srvyr %>%
+  group_by(nivel) %>%
+  summarize(proporcao = survey_mean(vartype = "cv"),
+            n=survey_total(vartype = "ci"))
+
+```
+
+
+
+# ggplot
+
+## Princípios
+
+- O que você quer mostrar? <https://i1.wp.com/www.tatvic.com/blog/wp-content/uploads/2016/12/Pic_2.png>
+
+- Elementos que podem **destacar** ou **confundir** o que você quer mostrar.
+
+ -- Exemplo Codeplan
+
+- vamos tentar alternar "teoria" com live code
+
+
+## Recursos
+
+- R Cookbook <http://www.cookbook-r.com/Graphs/>
+
+- STHDA <http://www.sthda.com/english/wiki/be-awesome-in-ggplot2-a-practical-guide-to-be-highly-effective-r-software-and-data-visualization>
+
+- R Graph Gallery <https://www.r-graph-gallery.com/>
+
+- Extensões <http://www.ggplot2-exts.org/>
+
+## Elementos do ggplot
+
+- Dados
+
+- Geometrias
+
+- Estéticas
+
+- Escalas (estética)
+
+- Escalas (eixos)
+
+- Tema
+
+- Facet
+
+
+## Dados `data = `
+
+- Dado empilhado?
+
+- Cada coluna será uma entrada!
+
+
+## Geometrias `geom_`
+
+- geom_`tipo_de_geometria`
+
+- Recursos +
+
+- cheat sheet  <https://www.rstudio.com/wp-content/uploads/2016/03/ggplot2-cheatsheet-portuguese.pdf>
+
+- manual ggplot <https://ggplot2.tidyverse.org/reference/>
+
+
+## Estéticas `aes()`
+
+- `x` (`xmax` e `xmin`)
+
+- `y`
+
+- `color`
+
+- `fill`
+
+- `shape`
+
+- `group`
+
+- `size`
+
+
+## Escalas (estética) `scale_`
+
+- `scale_color_xx`
+
+- `scale_fill_xx`
+
+- `scale_shape_xx`
+
+
+## Escalas (eixos) `scale_x`
+
+- Contínua `scale_x_continuous`
+
+- Discreta `scale_x_discrete`
+
+- Série de tempo `zoo` --> `scale_yearmon`
+
+
+## Tema
+
+- Customização total da visualização
+
+- Eixos
+
+- Texto `element_text`
+
+- linhas de grade 
+
+## Facet
+
+- facet_grid
+
+- facet_wrap
+
+## Gráficos com interatividade
+
+- ggiraph
+
+- plotly (ggplotly)
+
