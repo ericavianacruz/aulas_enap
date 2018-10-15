@@ -1,0 +1,228 @@
+---
+title: "Visualização de dados"
+author: "Frederico Bertholini"
+subtitle: Aula 07
+output:
+  ioslides_presentation: 
+    widescreen: yes
+  beamer_presentation: default
+---
+
+
+```{r,eval=T,include=F}
+
+lista.de.pacotes = c("tidyverse","lubridate","janitor","readxl","stringr","repmis","survey","srvyr") # escreva a lista de pacotes
+novos.pacotes <- lista.de.pacotes[!(lista.de.pacotes %in%
+                                      installed.packages()[,"Package"])]
+if(length(novos.pacotes) > 0) {install.packages(novos.pacotes)}
+lapply(lista.de.pacotes, require, character.only=T)
+rm(lista.de.pacotes,novos.pacotes)
+gc()
+
+knitr::opts_knit$set(root.dir = "/Volumes/Macintosh HD/OneDrive/ENAP/aulas_ENAP")
+
+```
+
+
+## Preparação para a aula
+
+- Baixe os dados da pasta exercícios (ou faça pull do seu GitHub)
+
+- Configure o GitHub na sua máquina 
+
+ -- Versionamento -> <https://www.curso-r.com/blog/2017-07-17-rstudio-e-github/>
+
+ -- Instruções adicionais de instalação <http://r-bio.github.io/git-installation/>
+
+- Rode todos os pacotes (usando o macetinho) --> pode baixar o script do exercício 6, que já tem tudo. 
+
+- Repositório no GitHub <https://github.com/fredbsr/aulas_ENAP/tree/master/CADS2018>
+
+
+
+# srvyr
+
+## Referências
+
+- Survey <http://r-survey.r-forge.r-project.org/survey/>
+
+- `srvyr` <https://cran.r-project.org/web/packages/srvyr/vignettes/srvyr-vs-survey.html>
+
+- Dados amostrais complexos ou aletórias simples (apenas peso amostral)
+
+## Desenho amostral
+
+- `as_survey()`
+
+ -- ids
+ 
+ -- strata
+ 
+ -- fpc
+ 
+ -- nest
+ 
+ -- weights
+
+Pronto, agora trabalhe como se estivesse em um *tibble* `tbl_df` normal, que será um `tbl_svy`
+
+
+
+## Este não é um curso de amostragem
+
+- Para maior aprofundamento, leia:
+
+ -- <http://r-survey.r-forge.r-project.org/svybook/>
+ 
+ -- <https://faculty.psau.edu.sa/filedownload/doc-12-pdf-532657fe8ef0e20eada1f34972a4b0dc-original.pdf>
+ 
+ -- <http://r-survey.r-forge.r-project.org/survey/survey-census.pdf>
+
+## Exemplo motivador
+
+- Dados de desempenho escolar por escola <http://r-survey.r-forge.r-project.org/survey/html/api.html>
+
+```{r}
+data(api) #dados de desempenho escolar
+```
+
+## 
+
+- `hsg` percentual de pais com graduação
+- `stype` é o tipo de escola (Elementary/Middle/High School)
+
+```{r}
+out <- apistrat %>%
+  mutate(hs_grad_pct = cut(hsg, c(0, 20, 100), include.lowest = TRUE,
+                           labels = c("<20%", "20+%"))) %>%
+  group_by(stype, hs_grad_pct) %>%
+  summarize(api_diff = weighted.mean(api00 - api99, pw),
+            n = n())
+
+```
+
+## Estimativas pontuais
+
+Variável `api-diff` 
+
+```{r, eval=F}
+ggplot(data = out, aes(x = stype, y = api_diff, group = hs_grad_pct, fill = hs_grad_pct)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(y = 0, label = n), position = position_dodge(width = 0.9), vjust = -1)
+```
+
+##
+```{r, echo=F}
+ggplot(data = out, aes(x = stype, y = api_diff, group = hs_grad_pct, fill = hs_grad_pct)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(y = 0, label = n), position = position_dodge(width = 0.9), vjust = -1)
+
+```
+
+
+## Estimativas intervalares
+
+- `survey_total`
+
+- `survey_mean`
+
+- `survey_median()`
+
+- `survey_ratio()`
+
+- `survey_quantile()`
+
+- Vamos ao live code
+
+## PNAD
+
+- PNADcIBGE <https://rpubs.com/BragaDouglas/335574>
+
+- ADSFree <http://asdfree.com/pesquisa-nacional-por-amostra-de-domicilios-continua-pnadc.html>
+
+## Exercício
+
+- Carregue os dados de exemplo do pacote survey `data(api)`
+
+- Qual a proporção de escolas por tipo? (use a variável `stype`)
+
+- Quantas escolas há por tipo? (use a variável `stype`)
+
+
+## Agora resolução aplicando o pacote survey que agrupa o desenho amostral e os dados juntos.
+```{r}
+strat_design_survey <- apistrat %>%
+    # os estratos vão ser os tipos de escola.
+    as_survey(strata = stype, fpc = fpc, weight  = pw)
+```
+
+## 
+```{r}
+apistrat
+out1 <- strat_design_survey %>%
+  ## hs_grad_pct classes de 
+  mutate(hs_grad_pct = cut(hsg, c(0, 20, 100), include.lowest = TRUE,
+                           labels = c("<20%", "20+%"))) %>%
+  group_by(stype, hs_grad_pct) %>%
+  ## CI é intervalo de confiança
+  summarize(api_diff = survey_mean(api00 - api99, vartype = "ci"),
+            n=unweighted(n()))
+
+```
+
+## Outro agrupamento
+```{r}
+strat_design_srvyr <- strat_design_survey %>%
+  mutate(api_diff = api00 - api99) %>%
+  rename (api_students = api.stu)
+  
+out2 <-  strat_design_srvyr %>% group_by(stype) %>%
+  ## intervalo de confiança
+  summarize(api_increase = survey_mean(api_diff, vartype = "ci"))
+```
+
+
+##
+
+```{r}
+
+out1 %>% 
+  ggplot(aes(x = stype, y = api_diff, group = hs_grad_pct, fill = hs_grad_pct,
+                       ymax = api_diff_upp, ymin = api_diff_low)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_errorbar(position = position_dodge(width = 0.9), width = 0.1) +
+  geom_text(aes(y = 0, label = n), position = position_dodge(width = 0.9), vjust = -1)
+```
+
+
+# ggplot
+
+## Princípios
+
+- O que você quer mostrar? <https://i1.wp.com/www.tatvic.com/blog/wp-content/uploads/2016/12/Pic_2.png>
+
+- Elementos que podem **destacar** ou **confundir** o que você quer mostrar.
+
+
+## Recursos
+
+- STHDA <http://www.sthda.com/english/wiki/be-awesome-in-ggplot2-a-practical-guide-to-be-highly-effective-r-software-and-data-visualization>
+
+- R Graph Gallery <https://www.r-graph-gallery.com/>
+
+
+
+
+## O básico
+
+- Geometrias
+
+- Estéticas
+
+- Escalas (estética)
+
+- Escalas (eixos)
+
+- Temas
+
+- Facet
