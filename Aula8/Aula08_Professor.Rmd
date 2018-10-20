@@ -73,10 +73,10 @@ srs_design_srvyr <- apisrs %>%
 ## 
 ```{r,eval=F}
 
-resolucao <- srs_design_srvyr %>%
+(resolucao <- srs_design_srvyr %>%
   group_by(nivel) %>%
   summarize(proporcao = survey_mean(vartype = "cv"),
-            n=survey_total(vartype = "ci"))
+            n=survey_total(vartype = "ci")))
 
 ```
 

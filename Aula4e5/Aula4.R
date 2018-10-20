@@ -11,7 +11,7 @@ rm(lista.de.pacotes,novos.pacotes)
 gc()
 
 ####  Carregando o arquivo
-setwd("E:/ENAP_Especializacao/D6_Analise_de_dados/aulas_enap/dados/")
+setwd("F:/ENAP_Especializacao/D6_Analise_de_dados/aulas_enap/dados/")
 decisoes <- read_rds("decisoes.rds")
 
 # Crie um objeto contendo o tempo médio entre decisão e registro por juiz, apenas para processos relacionados a drogas nos municípios de Campinas ou Limeira. ----
@@ -32,7 +32,7 @@ juizes_drogas_CL <-  decisoes %>%
   
 # Salve o objeto resultante em um arquivo chamado `juizes_drogas_CL.rds` ----
 
-write_rds(juizes_drogas_CL,"E:/ENAP_Especializacao/D6_Analise_de_dados/aulas_enap/dados/juizes_drogas_CL.rds")
+write_rds(juizes_drogas_CL,"F:/ENAP_Especializacao/D6_Analise_de_dados/aulas_enap/dados/juizes_drogas_CL.rds")
 
 # Faça commit e push do script e do arquivo `.rds` ----
 ##########################################################################################Segunda Parte da Aula

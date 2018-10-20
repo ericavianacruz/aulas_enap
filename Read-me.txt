@@ -1,0 +1,38 @@
+
+Falácia Ecológica - Quando não é possivel generalizar, exemplo aviões que voltam de guerra.
+
+Frequentistas versus Experimentalistas
+
+Onde está a aula.
+goo.gl/5xVnvn
+
+GitHub como utilizar.
+https://www.curso-r.com/blog/2017-07-17-rstudio-e-github/
+
+Rede social dos nerds
+https://stackoverflow.com/
+
+Repositório dos exercicios versionado
+https://github.com/ericavianacruz/aulas_enap.git 
+
+R for Data Science - Livro de referencia.
+
+
+Trabalho final
+Slides Html com conjunto de dados secundários com representações graficas que sinalizem
+intuições sobre os conjuntos de dados usando tidyverse, cuidado com o código deve estar organizado, usar pipe 
+e os conceitos apresentados. Vai ter de estar versionado no GitHub como começou a ensinar na aula de hoje.
+
+**************************************
+Teve de instalar o Git varias vezes. As máquinas não estavam prontas. O monitor passou a vir dia 04/10.
+
+
+###############################################Aula 8################################################################
+
+O peso é o inverso da proporção.
+População = 100
+Amostra = 10
+
+Probabilidade de seleção amostral é 10/100 = 0,1. 
+O peso é o inverso da probabilidade.
+Assim o peso amostral se eu quiser considerar 10 pessoas como população é 1/0,1 = 100/10 = 10.
