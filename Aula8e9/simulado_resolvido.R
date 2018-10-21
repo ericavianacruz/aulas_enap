@@ -18,6 +18,25 @@ decisoes <- decisoes %>%
            extra = 'merge', 
            fill = 'right') 
 
+decisoes %>% 
+  select(id_decisao,municipio,data_decisao,juiz) %>% 
+  filter (dmy(data_decisao) >= dmy("01-01-2017"), dmy(data_decisao) <= dmy("01-01-2018"))
+
+decisoes_sem_na %>% filter (!is.na(txt_decisao))
+
+##mutate para pegar deciçoes que tratam apenas de drogas
+decisoes_drogas <- decisoes %>% filter (!is.na(txt_decisao)) %>%
+  mutate(txt_decisao_minisculas = tolower(txt_decisao), droga = str_detect(txt_decisao, "drogas|haxixe|coca[í]na"))
+decisoes_drogas
+
+decisoes_drogas %>% dplyr::select(n_processo, droga)
+
+sum (decisoes_drogas$droga == 'TRUE')
+sum (decisoes_drogas$droga == 'FALSE')
+
+## filter
+(decisoe_select <- decisoes %>% filter(municipio == "São Paulo")) 
+
 # 3. Elabore um data.frame em que as linhas sejam o assunto, as colunas sejam os anos e os valores 
 # sejam as quantidades de decisões 
 # Dica 1: crie uma variável `ano` e exclua os casos em que não há informação sobre data da decisão
