@@ -18,7 +18,6 @@ gc()
 
 ## Lendo arquivo de decisões
 setwd("F:/ENAP_Especializacao/D6_Analise_de_dados/aulas_enap/") ## Diretório de trabalho.
-
 decisoes <- read_rds("dados/decisoes.rds")
 
 
@@ -31,7 +30,4 @@ data(api)
 # Elimine os objetos 'apiclus1', 'apiclus2', 'apipop' e 'apistrat'
 # mantendo apenas o objeto apisrs
 rm(apiclus1,apiclus2,apipop,apistrat)
-
-
-
 

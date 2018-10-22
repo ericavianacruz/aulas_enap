@@ -7,7 +7,10 @@ library(tidyverse)
 library(lubridate)
 
 # 1. Carregue o arquivo `decisoes.rds` em um objeto chamado `decisoes`.
-decisoes <- read_rds("CADS2018/Exercícios/dados/decisoes.rds")
+setwd("F:/ENAP_Especializacao/D6_Analise_de_dados/aulas_enap/") ## Diretório de trabalho.
+
+decisoes <- read_rds("dados/decisoes.rds")
+
 
 # 2. Separe a coluna `classe_assunto` em duas colunas, uma contendo a `classe` 
 # e outra contendo o `assunto`
@@ -25,9 +28,11 @@ decisoes %>%
 decisoes_sem_na %>% filter (!is.na(txt_decisao))
 
 ##mutate para pegar deciçoes que tratam apenas de drogas
-decisoes_drogas <- decisoes %>% filter (!is.na(txt_decisao)) %>%
-  mutate(txt_decisao_minisculas = tolower(txt_decisao), droga = str_detect(txt_decisao, "drogas|haxixe|coca[í]na"))
-decisoes_drogas
+(decisoes_drogas <- decisoes %>% filter (!is.na(txt_decisao)) %>%
+  mutate(txt_decisao_minisculas = tolower(txt_decisao), 
+         droga = str_detect(txt_decisao, "drogas|haxixe|coca[í]na")) %>%
+## Ordernar, porque não está fucionando??
+    arrange(desc(ymd(dmy(data_decisao)))))
 
 decisoes_drogas %>% dplyr::select(n_processo, droga)
 
@@ -35,7 +40,7 @@ sum (decisoes_drogas$droga == 'TRUE')
 sum (decisoes_drogas$droga == 'FALSE')
 
 ## filter
-(decisoe_select <- decisoes %>% filter(municipio == "São Paulo")) 
+(decisoes_select <- decisoes %>% filter(municipio == "São Paulo")) 
 
 # 3. Elabore um data.frame em que as linhas sejam o assunto, as colunas sejam os anos e os valores 
 # sejam as quantidades de decisões 
